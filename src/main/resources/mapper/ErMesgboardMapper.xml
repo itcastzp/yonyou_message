@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yonyou.message.mapper.ErMesgboardMapper">
+  <resultMap id="BaseResultMap" type="com.yonyou.message.po.ErMesgboard">
+    <constructor>
+      <idArg column="pk_mesgid" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="pk_djbh" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="usercode" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="userName" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="mesg" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="createtime" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="touser" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="dr" javaType="java.lang.Integer" jdbcType="INTEGER" />
+    </constructor>
+  </resultMap>
+
+  <resultMap id="messageMap" type="com.yonyou.message.po.ErMesgboard">
+    <id column="pk_mesgid" property="pkMesgid" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="pk_djbh" property="pkDjbh" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="usercode" property="usercode" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="userName" property="username" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="mesg" property="mesg" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="createtime" property="createtime" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="touser" property="touser" javaType="java.lang.String" jdbcType="VARCHAR" />
+
+
+  </resultMap>
+
+  <resultMap id="messageHistoryMap" type="com.yonyou.message.po.ErMesgboard">
+    <id column="pk_mesgid" property="pkMesgid" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="pk_djbh" property="pkDjbh" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="usercode" property="usercode" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="userName" property="username" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="mesg" property="mesg" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="createtime" property="createtime" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="touser" property="touser" javaType="java.lang.String" jdbcType="VARCHAR" />
+
+
+  </resultMap>
+
+  <update id="updateByPrimaryKey" parameterType="java.lang.String">
+    update er_mesgboard
+    set
+      dr = #{1,jdbcType=INTEGER}
+    where pk_mesgid = #{pkMesgid,jdbcType=VARCHAR}
+  </update>
+
+
+
+  <sql id="Base_Column_List">
+    pk_mesgid, pk_djbh, usercode, userName, mesg, createtime, touser, dr
+  </sql>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="messageMap">
+    select
+    <include refid="Base_Column_List" />
+    from er_mesgboard
+    where pk_mesgid = #{pkMesgid,jdbcType=VARCHAR} AND dr=0
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from er_mesgboard
+    where pk_mesgid = #{pkMesgid,jdbcType=VARCHAR}
+  </delete>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="pkMesgid" parameterType="com.yonyou.message.po.ErMesgboard">
+
+    insert into er_mesgboard ( pk_djbh, usercode,
+      userName, mesg, createtime, 
+      touser)
+    values ( #{pkDjbh,jdbcType=VARCHAR},#{usercode,jdbcType=VARCHAR},
+      #{username,jdbcType=VARCHAR}, #{mesg,jdbcType=VARCHAR}, #{createtime,jdbcType=VARCHAR}, 
+      #{touser,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yonyou.message.po.ErMesgboard">
+    insert into er_mesgboard
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="pkMesgid != null">
+        pk_mesgid,
+      </if>
+      <if test="pkDjbh != null">
+        pk_djbh,
+      </if>
+      <if test="usercode != null">
+        usercode,
+      </if>
+      <if test="username != null">
+        userName,
+      </if>
+      <if test="mesg != null">
+        mesg,
+      </if>
+      <if test="createtime != null">
+        createtime,
+      </if>
+      <if test="touser != null">
+        touser,
+      </if>
+      <if test="dr != null">
+        dr,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="pkMesgid != null">
+        #{pkMesgid,jdbcType=VARCHAR},
+      </if>
+      <if test="pkDjbh != null">
+        #{pkDjbh,jdbcType=VARCHAR},
+      </if>
+      <if test="usercode != null">
+        #{usercode,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="mesg != null">
+        #{mesg,jdbcType=VARCHAR},
+      </if>
+      <if test="createtime != null">
+        #{createtime,jdbcType=VARCHAR},
+      </if>
+      <if test="touser != null">
+        #{touser,jdbcType=VARCHAR},
+      </if>
+      <if test="dr != null">
+        #{dr,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+
+  <update id="updateByExampleSelective" parameterType="map">
+    update er_mesgboard
+    <set>
+      <if test="record.pkMesgid != null">
+        pk_mesgid = #{record.pkMesgid,jdbcType=VARCHAR},
+      </if>
+      <if test="record.pkDjbh != null">
+        pk_djbh = #{record.pkDjbh,jdbcType=VARCHAR},
+      </if>
+      <if test="record.usercode != null">
+        usercode = #{record.usercode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.username != null">
+        userName = #{record.username,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mesg != null">
+        mesg = #{record.mesg,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createtime != null">
+        createtime = #{record.createtime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.touser != null">
+        touser = #{record.touser,jdbcType=VARCHAR},
+      </if>
+      <if test="record.dr != null">
+        dr = #{record.dr,jdbcType=INTEGER},
+      </if>
+    </set>
+
+  </update>
+
+  <select id="getHistoryMessages" resultMap="messageHistoryMap">
+    SELECT
+    <include refid="Base_Column_List" /> FROM er_mesgboard
+    where pk_djbh = #{pkMesgid,jdbcType=VARCHAR}
+
+  </select>
+</mapper>
