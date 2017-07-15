@@ -1,27 +1,53 @@
 package com.yonyou.message.po;
 
 public class ErMesgboard {
-    private String pkMesgid;
+    private String messageId;
 
-    private String pkDjbh;
+    public String getBillPk() {
+        return billPk;
+    }
 
-    private String usercode;
+    public void setBillPk(String billPk) {
+        this.billPk = billPk;
+    }
 
-    private String username;
+    private String billPk;
 
-    private String mesg;
+    private String senderId;
 
-    private String createtime;
+    private String senderName;
+
+    private String content;
+
+    private String sendTime;
 
     private String touser;
+    private String isall;
+    private String isread;
 
-    public ErMesgboard(String pkMesgid, String pkDjbh, String usercode, String username, String mesg, String createtime, String touser) {
-        this.pkMesgid = pkMesgid;
-        this.pkDjbh = pkDjbh;
-        this.usercode = usercode;
-        this.username = username;
-        this.mesg = mesg;
-        this.createtime = createtime;
+    public String getIsread() {
+        return isread;
+    }
+
+    public void setIsread(String isread) {
+        this.isread = isread;
+    }
+
+    public String getIsall() {
+        return isall;
+    }
+
+    public void setIsall(String isall) {
+        this.isall = isall;
+    }
+
+    public ErMesgboard(String pkMesgid, String billPk, String usercode, String username, String content, String createtime, String touser) {
+        this.messageId = pkMesgid;
+        this.billPk = billPk;
+        this.senderId = usercode;
+        this.senderName = username;
+        this.content = content;
+        this.sendTime = createtime;
         this.touser = touser;
     }
 
@@ -29,52 +55,44 @@ public class ErMesgboard {
         super();
     }
 
-    public String getPkMesgid() {
-        return pkMesgid;
+    public String getMessageId() {
+        return messageId;
     }
 
-    public void setPkMesgid(String pkMesgid) {
-        this.pkMesgid = pkMesgid == null ? null : pkMesgid.trim();
+    public void setMessageId(String messageId) {
+        this.messageId = messageId == null ? null : messageId.trim();
     }
 
-    public String getPkDjbh() {
-        return pkDjbh;
+    public String getSenderId() {
+        return senderId;
     }
 
-    public void setPkDjbh(String pkDjbh) {
-        this.pkDjbh = pkDjbh == null ? null : pkDjbh.trim();
+    public void setSenderId(String senderId) {
+        this.senderId = senderId == null ? null : senderId.trim();
     }
 
-    public String getUsercode() {
-        return usercode;
+    public String getSenderName() {
+        return senderName;
     }
 
-    public void setUsercode(String usercode) {
-        this.usercode = usercode == null ? null : usercode.trim();
+    public void setSenderName(String senderName) {
+        this.senderName = senderName == null ? null : senderName.trim();
     }
 
-    public String getUsername() {
-        return username;
+    public String getContent() {
+        return content;
     }
 
-    public void setUsername(String username) {
-        this.username = username == null ? null : username.trim();
+    public void setContent(String content) {
+        this.content = content == null ? null : content.trim();
     }
 
-    public String getMesg() {
-        return mesg;
+    public String getSendTime() {
+        return sendTime;
     }
 
-    public void setMesg(String mesg) {
-        this.mesg = mesg == null ? null : mesg.trim();
-    }
-
-    public String getCreatetime() {
-        return createtime;
-    }
-
-    public void setCreatetime(String createtime) {
-        this.createtime = createtime == null ? null : createtime.trim();
+    public void setSendTime(String sendTime) {
+        this.sendTime = sendTime == null ? null : sendTime.trim();
     }
 
     public String getTouser() {

@@ -4,93 +4,103 @@
   <resultMap id="BaseResultMap" type="com.yonyou.message.po.ErMesgboard">
     <constructor>
       <idArg column="pk_mesgid" javaType="java.lang.String" jdbcType="VARCHAR" />
-      <arg column="pk_djbh" javaType="java.lang.String" jdbcType="VARCHAR" />
-      <arg column="usercode" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="billPk" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="senderId" javaType="java.lang.String" jdbcType="VARCHAR" />
       <arg column="userName" javaType="java.lang.String" jdbcType="VARCHAR" />
-      <arg column="mesg" javaType="java.lang.String" jdbcType="VARCHAR" />
-      <arg column="createtime" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="content" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="sendTime" javaType="java.lang.String" jdbcType="VARCHAR" />
       <arg column="touser" javaType="java.lang.String" jdbcType="VARCHAR" />
       <arg column="dr" javaType="java.lang.Integer" jdbcType="INTEGER" />
     </constructor>
   </resultMap>
 
   <resultMap id="messageMap" type="com.yonyou.message.po.ErMesgboard">
-    <id column="pk_mesgid" property="pkMesgid" javaType="java.lang.String" jdbcType="VARCHAR" />
-    <result column="pk_djbh" property="pkDjbh" javaType="java.lang.String" jdbcType="VARCHAR" />
-    <result column="usercode" property="usercode" javaType="java.lang.String" jdbcType="VARCHAR" />
-    <result column="userName" property="username" javaType="java.lang.String" jdbcType="VARCHAR" />
-    <result column="mesg" property="mesg" javaType="java.lang.String" jdbcType="VARCHAR" />
-    <result column="createtime" property="createtime" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <id column="pk_mesgid" property="messageId" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="billPk" property="billPk" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="senderId" property="senderId" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="userName" property="senderName" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="content" property="content" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="sendTime" property="sendTime" javaType="java.lang.String" jdbcType="VARCHAR" />
     <result column="touser" property="touser" javaType="java.lang.String" jdbcType="VARCHAR" />
 
 
   </resultMap>
 
   <resultMap id="messageHistoryMap" type="com.yonyou.message.po.ErMesgboard">
-    <id column="pk_mesgid" property="pkMesgid" javaType="java.lang.String" jdbcType="VARCHAR" />
-    <result column="pk_djbh" property="pkDjbh" javaType="java.lang.String" jdbcType="VARCHAR" />
-    <result column="usercode" property="usercode" javaType="java.lang.String" jdbcType="VARCHAR" />
-    <result column="userName" property="username" javaType="java.lang.String" jdbcType="VARCHAR" />
-    <result column="mesg" property="mesg" javaType="java.lang.String" jdbcType="VARCHAR" />
-    <result column="createtime" property="createtime" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <id column="messageId" property="messageId" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="billPk" property="billPk" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="senderId" property="senderId" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="senderName" property="senderName" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="content" property="content" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="sendTime" property="sendTime" javaType="java.lang.String" jdbcType="VARCHAR" />
     <result column="touser" property="touser" javaType="java.lang.String" jdbcType="VARCHAR" />
 
 
   </resultMap>
+  <resultMap id="messageUseridPkdjhMap" type="com.yonyou.message.po.ErMesgboard">
+    <id column="messageId" property="messageId" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="billPk" property="billPk" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="senderId" property="senderId" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="senderName" property="senderName" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="content" property="content" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="sendTime" property="sendTime" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="touser" property="touser" javaType="java.lang.String" jdbcType="VARCHAR" />
 
+
+  </resultMap>
   <update id="updateByPrimaryKey" parameterType="java.lang.String">
     update er_mesgboard
     set
-      dr = #{1,jdbcType=INTEGER}
-    where pk_mesgid = #{pkMesgid,jdbcType=VARCHAR}
+      dr = 1
+    where messageId = #{messageId,jdbcType=VARCHAR}
   </update>
 
 
 
   <sql id="Base_Column_List">
-    pk_mesgid, pk_djbh, usercode, userName, mesg, createtime, touser, dr
+    messageId, billPk, senderId, senderName, content, sendTime, touser, dr
   </sql>
 
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="messageMap">
     select
     <include refid="Base_Column_List" />
     from er_mesgboard
-    where pk_mesgid = #{pkMesgid,jdbcType=VARCHAR} AND dr=0
+    where messageId = #{messageId,jdbcType=VARCHAR} AND dr=0
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
     delete from er_mesgboard
-    where pk_mesgid = #{pkMesgid,jdbcType=VARCHAR}
+    where messageId = #{messageId,jdbcType=VARCHAR}
   </delete>
 
-  <insert id="insert" useGeneratedKeys="true" keyProperty="pkMesgid" parameterType="com.yonyou.message.po.ErMesgboard">
+  <insert id="insert" useGeneratedKeys="true" keyProperty="messageId" parameterType="com.yonyou.message.po.ErMesgboard">
 
-    insert into er_mesgboard ( pk_djbh, usercode,
-      userName, mesg, createtime, 
-      touser)
-    values ( #{pkDjbh,jdbcType=VARCHAR},#{usercode,jdbcType=VARCHAR},
-      #{username,jdbcType=VARCHAR}, #{mesg,jdbcType=VARCHAR}, #{createtime,jdbcType=VARCHAR}, 
-      #{touser,jdbcType=VARCHAR})
+    insert into er_mesgboard ( billPk, senderId,
+      senderName, content, sendTime,
+      touser,isall,isread)
+    values ( #{billPk,jdbcType=VARCHAR},#{senderId,jdbcType=VARCHAR},
+      #{senderName,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, #{sendTime,jdbcType=VARCHAR},
+      #{touser,jdbcType=VARCHAR},#{isall,jdbcType=VARCHAR},   CONCAT( ',[',REPLACE(#{isread},',','],[' ) , ']' ) )
   </insert>
   <insert id="insertSelective" parameterType="com.yonyou.message.po.ErMesgboard">
     insert into er_mesgboard
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="pkMesgid != null">
+      <if test="messageId != null">
         pk_mesgid,
       </if>
-      <if test="pkDjbh != null">
-        pk_djbh,
+      <if test="billPk != null">
+        billPk,
       </if>
-      <if test="usercode != null">
-        usercode,
+      <if test="senderId != null">
+        senderId,
       </if>
-      <if test="username != null">
+      <if test="senderName != null">
         userName,
       </if>
-      <if test="mesg != null">
-        mesg,
+      <if test="content != null">
+        content,
       </if>
-      <if test="createtime != null">
-        createtime,
+      <if test="sendTime != null">
+        sendTime,
       </if>
       <if test="touser != null">
         touser,
@@ -100,23 +110,23 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="pkMesgid != null">
-        #{pkMesgid,jdbcType=VARCHAR},
+      <if test="messageId != null">
+        #{messageId,jdbcType=VARCHAR},
       </if>
-      <if test="pkDjbh != null">
-        #{pkDjbh,jdbcType=VARCHAR},
+      <if test="billPk != null">
+        #{billPk,jdbcType=VARCHAR},
       </if>
-      <if test="usercode != null">
-        #{usercode,jdbcType=VARCHAR},
+      <if test="senderId != null">
+        #{senderId,jdbcType=VARCHAR},
       </if>
-      <if test="username != null">
-        #{username,jdbcType=VARCHAR},
+      <if test="senderName != null">
+        #{senderName,jdbcType=VARCHAR},
       </if>
-      <if test="mesg != null">
-        #{mesg,jdbcType=VARCHAR},
+      <if test="content != null">
+        #{content,jdbcType=VARCHAR},
       </if>
-      <if test="createtime != null">
-        #{createtime,jdbcType=VARCHAR},
+      <if test="sendTime != null">
+        #{sendTime,jdbcType=VARCHAR},
       </if>
       <if test="touser != null">
         #{touser,jdbcType=VARCHAR},
@@ -130,23 +140,23 @@
   <update id="updateByExampleSelective" parameterType="map">
     update er_mesgboard
     <set>
-      <if test="record.pkMesgid != null">
-        pk_mesgid = #{record.pkMesgid,jdbcType=VARCHAR},
+      <if test="record.messageId != null">
+        pk_mesgid = #{record.messageId,jdbcType=VARCHAR},
       </if>
-      <if test="record.pkDjbh != null">
-        pk_djbh = #{record.pkDjbh,jdbcType=VARCHAR},
+      <if test="record.pkdjbh != null">
+        billPk = #{record.billPk,jdbcType=VARCHAR},
       </if>
-      <if test="record.usercode != null">
-        usercode = #{record.usercode,jdbcType=VARCHAR},
+      <if test="record.senderId != null">
+        senderId = #{record.senderId,jdbcType=VARCHAR},
       </if>
-      <if test="record.username != null">
-        userName = #{record.username,jdbcType=VARCHAR},
+      <if test="record.senderName != null">
+        userName = #{record.senderName,jdbcType=VARCHAR},
       </if>
-      <if test="record.mesg != null">
-        mesg = #{record.mesg,jdbcType=VARCHAR},
+      <if test="record.content != null">
+        content = #{record.content,jdbcType=VARCHAR},
       </if>
-      <if test="record.createtime != null">
-        createtime = #{record.createtime,jdbcType=VARCHAR},
+      <if test="record.sendTime != null">
+        sendTime = #{record.sendTime,jdbcType=VARCHAR},
       </if>
       <if test="record.touser != null">
         touser = #{record.touser,jdbcType=VARCHAR},
@@ -161,7 +171,33 @@
   <select id="getHistoryMessages" resultMap="messageHistoryMap">
     SELECT
     <include refid="Base_Column_List" /> FROM er_mesgboard
-    where pk_djbh = #{pkMesgid,jdbcType=VARCHAR}
+    where billPk = #{0,jdbcType=VARCHAR} and (isall =0 or senderid=#{1,jdbcType=VARCHAR}) and dr=0 OR (billPk = #{0,jdbcType=VARCHAR} and find_in_set((select id from er_user where cuserid =#{1,jdbcType=VARCHAR}),touser) and dr=0)
 
   </select>
+
+  <select id="selectByUserPkdjh" resultMap="messageHistoryMap">
+    select er_mesgboard.messageId,er_mesgboard.billPk,er_mesgboard.senderId,er_mesgboard.senderName,er_mesgboard.sendTime,er_mesgboard.content,er_mesgboard.isread,er_mesgboard.touser
+from er_mesgboard ,(select id from er_user where er_user.cuserid=#{0}) user  where
+    find_in_set (CONCAT( '[',REPLACE(user.id,',','],[' ) , ']' ),er_mesgboard.isread) and er_mesgboard.isall=1 AND er_mesgboard.billPk=#{1}
+  </select>
+  <update id="updateUnReadMessage" parameterType="java.util.List">
+
+    <foreach collection="list" item="message" index="index" open="" close="" separator=";">
+      update er_mesgboard
+      <set>
+        isread  = #{message.isread}
+      </set>
+      WHERE messageid = #{message.messageId};
+    </foreach>
+  </update>
+
+  <select id="selectByUserBillIds" resultMap="messageHistoryMap">
+    select er_mesgboard.messageId,er_mesgboard.billPk,er_mesgboard.senderId,er_mesgboard.senderName,er_mesgboard.sendTime,er_mesgboard.content,er_mesgboard.isread,er_mesgboard.touser
+from er_mesgboard ,(select id from er_user where er_user.cuserid=#{userid}) user  where
+    find_in_set (CONCAT( '[',REPLACE(user.id,',','],[' ) , ']' ),er_mesgboard.isread) and er_mesgboard.isall=1 AND er_mesgboard.billPk in
+    <foreach collection="billids" item="item" open="(" close=")" separator=",">
+      #{item.billid}
+    </foreach>
+  </select>
+
 </mapper>

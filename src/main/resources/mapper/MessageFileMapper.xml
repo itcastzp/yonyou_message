@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yonyou.message.mapper.MessageFileMapper">
+    <sql id="file_list">
+      file_id,file_name,file_path,messageid,file_uploader,file_time
+    </sql>
+    <insert id="inserFile" useGeneratedKeys="true" keyProperty="file_id"  parameterType="com.yonyou.message.po.MessageFile">
+        INSERT INTO er_messagefile (file_name,file_path,messageid,file_uploader,file_time)
+        VALUES (#{file_name,jdbcType=VARCHAR},#{file_path,jdbcType=VARCHAR},#{messageid,jdbcType=VARCHAR},
+        #{file_uploader,jdbcType=VARCHAR},#{file_time,jdbcType=VARCHAR})
+
+    </insert>
+    <select id="getMessageFile" resultType="com.yonyou.message.po.MessageFile">
+      SELECT file_id,<include refid="file_list"></include>
+        FROM er_messagefile WHERE messageid=#{messagid,jdbcType=VARCHAR}
+    </select>
+
+    <delete id="deleteFile">
+        DELETE  FROM er_messagefile where file_id=#{file_id,jdbcType=VARCHAR}
+    </delete>
+    <select id="getMessageFileByFileName" resultType="com.yonyou.message.po.MessageFile">
+        SELECT file_id,<include refid="file_list"></include>
+        FROM er_messagefile WHERE file_name=#{0,jdbcType=VARCHAR} AND messageid=#{1,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getMessageFileByFileId" resultType="com.yonyou.message.po.MessageFile">
+        SELECT file_id,<include refid="file_list"></include>
+        FROM er_messagefile WHERE file_id=#{fileid,jdbcType=VARCHAR}
+    </select>
+</mapper>

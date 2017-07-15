@@ -1,37 +1,35 @@
 package com.yonyou.message.po;
 
 public class ErUser {
-    private String userid;
+    private String id;
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    private String cuserid;
     private String busnessId;
 
     private String usercode;
 
-    private String userName;
+    private String user_name;
 
-    private String userPhone;
+    private String user_phone;
 
-    private String userEmail;
+    private String user_email;
 
-    public ErUser(String userid, String busnessId, String usercode, String userName, String userPhone, String userEmail) {
-        this.userid = userid;
-        this.busnessId = busnessId;
-        this.usercode = usercode;
-        this.userName = userName;
-        this.userPhone = userPhone;
-        this.userEmail = userEmail;
+    private String activity;
+
+    public String getActivity() {
+        return activity;
     }
 
-    public ErUser() {
-        super();
-    }
-
-    public String getUserid() {
-        return userid;
-    }
-
-    public void setUserid(String userid) {
-        this.userid = userid == null ? null : userid.trim();
+    public void setActivity(String activity) {
+        this.activity = activity;
     }
 
     public String getBusnessId() {
@@ -39,7 +37,39 @@ public class ErUser {
     }
 
     public void setBusnessId(String busnessId) {
-        this.busnessId = busnessId == null ? null : busnessId.trim();
+        this.busnessId = busnessId;
+    }
+
+    public String getCuserid() {
+        return cuserid;
+    }
+
+    public void setCuserid(String cuserid) {
+        this.cuserid = cuserid;
+    }
+
+    public String getUser_email() {
+        return user_email;
+    }
+
+    public void setUser_email(String user_email) {
+        this.user_email = user_email;
+    }
+
+    public String getUser_name() {
+        return user_name;
+    }
+
+    public void setUser_name(String user_name) {
+        this.user_name = user_name;
+    }
+
+    public String getUser_phone() {
+        return user_phone;
+    }
+
+    public void setUser_phone(String user_phone) {
+        this.user_phone = user_phone;
     }
 
     public String getUsercode() {
@@ -47,30 +77,6 @@ public class ErUser {
     }
 
     public void setUsercode(String usercode) {
-        this.usercode = usercode == null ? null : usercode.trim();
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName == null ? null : userName.trim();
-    }
-
-    public String getUserPhone() {
-        return userPhone;
-    }
-
-    public void setUserPhone(String userPhone) {
-        this.userPhone = userPhone == null ? null : userPhone.trim();
-    }
-
-    public String getUserEmail() {
-        return userEmail;
-    }
-
-    public void setUserEmail(String userEmail) {
-        this.userEmail = userEmail == null ? null : userEmail.trim();
+        this.usercode = usercode;
     }
 }

@@ -16,15 +16,22 @@
     <!-- 配置自己的日志类 -->
     <!-- 		<property name="statLogger" ref="myLog" /> -->
 
+    <bean id="wall-filter" class="com.alibaba.druid.wall.WallFilter">
+        <property name="config" ref="wall-config" />
+    </bean>
+
+    <bean id="wall-config" class="com.alibaba.druid.wall.WallConfig">
+        <property name="multiStatementAllow" value="true" />
+    </bean>
     <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
         <!-- 基本属性 url、user、password -->
 
         <property name="url" value="${jdbc.url}" />
-        <property name="username" value="${jdbc.username}" />
+        <property name="username" value="${jdbc.senderName}" />
         <property name="password" value="${jdbc.password}" />
         <property name="driverClassName" value="${jdbc.driver}" />
         <!-- 配置监控统计拦截的filters -->
-        <property name="filters" value="stat,wall" />
+        <property name="filters" value="stat" />
         <!-- 配置初始化大小、最小、最大 -->
         <property name="maxActive" value="20" />
         <property name="initialSize" value="1" />
@@ -47,7 +54,13 @@
         <property name="poolPreparedStatements" value="false" />
         <property name="maxPoolPreparedStatementPerConnectionSize" value="20" />
         <!--如果用Oracle，则把poolPreparedStatements配置为true，mysql可以配置为false。分库分表较多的数据库，建议配置为false。-->
+        <property name="proxyFilters">
+            <list>
+                <ref bean="wall-filter"/>
+            </list>
+        </property>
     </bean>
+
     <!-- Mybatis文件 -->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource"></property>
@@ -56,6 +69,12 @@
         <property name="mapperLocations"
                   value="classpath:mapper/*Mapper.xml"></property>
 
+    </bean>
+    <bean id="sqlSessionTemplate" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg index="0" ref="sqlSessionFactory"></constructor-arg >
+    </bean>
+    <bean id="mybatisdao" class="com.yonyou.message.utils.MybatisDao">
+        <property name="sqlSessionTemplate" ref="sqlSessionTemplate"/>
     </bean>
     <!-- 扫描相关的Mapper接口 -->
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">

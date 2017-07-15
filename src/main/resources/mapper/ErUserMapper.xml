@@ -2,14 +2,14 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.yonyou.message.mapper.ErUserMapper" >
   <resultMap id="BaseResultMap" type="com.yonyou.message.po.ErUser" >
-    <constructor >
-      <idArg column="userid" jdbcType="VARCHAR" javaType="java.lang.String" />
-      <arg column="busness_id" jdbcType="VARCHAR" javaType="java.lang.String" />
-      <arg column="usercode" jdbcType="VARCHAR" javaType="java.lang.String" />
-      <arg column="user_name" jdbcType="VARCHAR" javaType="java.lang.String" />
-      <arg column="user_phone" jdbcType="VARCHAR" javaType="java.lang.String" />
-      <arg column="user_email" jdbcType="VARCHAR" javaType="java.lang.String" />
-    </constructor>
+
+      <id column="id" property="id" jdbcType="VARCHAR" />
+      <result column="cuserid" property="cuserid" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <result column="busness_id" property="busnessId" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <result column="usercode" property="usercode" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <result column="user_name" property="user_name" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <result column="user_phone" property="user_phone" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <result column="user_email" property="user_email" jdbcType="VARCHAR" javaType="java.lang.String" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -70,14 +70,14 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    userid, busness_id, usercode, user_name, user_phone, user_email
+    id,cuserid, busness_id, usercode, user_name, user_phone, user_email
   </sql>
 
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
     from er_user
-    where userid = #{userid,jdbcType=VARCHAR}
+    where cuserid = #{userid,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from er_user
@@ -85,56 +85,14 @@
   </delete>
 
   <insert id="insert" parameterType="com.yonyou.message.po.ErUser" >
-    insert into er_user (userid, busness_id, usercode, 
+    insert into er_user (userid, busness_id, senderId,
       user_name, user_phone, user_email
       )
-    values (#{userid,jdbcType=VARCHAR}, #{busnessId,jdbcType=VARCHAR}, #{usercode,jdbcType=VARCHAR}, 
+    values (#{userid,jdbcType=VARCHAR}, #{busnessId,jdbcType=VARCHAR}, #{senderId,jdbcType=VARCHAR},
       #{userName,jdbcType=VARCHAR}, #{userPhone,jdbcType=VARCHAR}, #{userEmail,jdbcType=VARCHAR}
       )
   </insert>
-  <insert id="insertSelective" parameterType="com.yonyou.message.po.ErUser" >
-    insert into er_user
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="userid != null" >
-        userid,
-      </if>
-      <if test="busnessId != null" >
-        busness_id,
-      </if>
-      <if test="usercode != null" >
-        usercode,
-      </if>
-      <if test="userName != null" >
-        user_name,
-      </if>
-      <if test="userPhone != null" >
-        user_phone,
-      </if>
-      <if test="userEmail != null" >
-        user_email,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="userid != null" >
-        #{userid,jdbcType=VARCHAR},
-      </if>
-      <if test="busnessId != null" >
-        #{busnessId,jdbcType=VARCHAR},
-      </if>
-      <if test="usercode != null" >
-        #{usercode,jdbcType=VARCHAR},
-      </if>
-      <if test="userName != null" >
-        #{userName,jdbcType=VARCHAR},
-      </if>
-      <if test="userPhone != null" >
-        #{userPhone,jdbcType=VARCHAR},
-      </if>
-      <if test="userEmail != null" >
-        #{userEmail,jdbcType=VARCHAR},
-      </if>
-    </trim>
-  </insert>
+
 
   <update id="updateByExampleSelective" parameterType="map" >
     update er_user
@@ -145,8 +103,8 @@
       <if test="record.busnessId != null" >
         busness_id = #{record.busnessId,jdbcType=VARCHAR},
       </if>
-      <if test="record.usercode != null" >
-        usercode = #{record.usercode,jdbcType=VARCHAR},
+      <if test="record.senderId != null" >
+        senderId = #{record.senderId,jdbcType=VARCHAR},
       </if>
       <if test="record.userName != null" >
         user_name = #{record.userName,jdbcType=VARCHAR},
@@ -166,7 +124,7 @@
     update er_user
     set userid = #{record.userid,jdbcType=VARCHAR},
       busness_id = #{record.busnessId,jdbcType=VARCHAR},
-      usercode = #{record.usercode,jdbcType=VARCHAR},
+      senderId = #{record.senderId,jdbcType=VARCHAR},
       user_name = #{record.userName,jdbcType=VARCHAR},
       user_phone = #{record.userPhone,jdbcType=VARCHAR},
       user_email = #{record.userEmail,jdbcType=VARCHAR}
@@ -174,34 +132,30 @@
       <include refid="Update_By_Example_Where_Clause" />
     </if>
   </update>
-  <update id="updateByPrimaryKeySelective" parameterType="com.yonyou.message.po.ErUser" >
-    update er_user
-    <set >
-      <if test="busnessId != null" >
-        busness_id = #{busnessId,jdbcType=VARCHAR},
-      </if>
-      <if test="usercode != null" >
-        usercode = #{usercode,jdbcType=VARCHAR},
-      </if>
-      <if test="userName != null" >
-        user_name = #{userName,jdbcType=VARCHAR},
-      </if>
-      <if test="userPhone != null" >
-        user_phone = #{userPhone,jdbcType=VARCHAR},
-      </if>
-      <if test="userEmail != null" >
-        user_email = #{userEmail,jdbcType=VARCHAR},
-      </if>
-    </set>
-    where userid = #{userid,jdbcType=VARCHAR}
-  </update>
+
   <update id="updateByPrimaryKey" parameterType="com.yonyou.message.po.ErUser" >
     update er_user
     set busness_id = #{busnessId,jdbcType=VARCHAR},
-      usercode = #{usercode,jdbcType=VARCHAR},
+      senderId = #{senderId,jdbcType=VARCHAR},
       user_name = #{userName,jdbcType=VARCHAR},
       user_phone = #{userPhone,jdbcType=VARCHAR},
       user_email = #{userEmail,jdbcType=VARCHAR}
     where userid = #{userid,jdbcType=VARCHAR}
   </update>
+  <insert id="insertUsers" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyProperty="id">
+    INSERT into er_user (cuserid, usercode, user_name, user_phone, user_email) VALUES
+    <foreach collection="list" item="user" index="index" separator=",">
+      (#{user.cuserid},#{user.usercode},#{user.user_name},#{user.user_phone},#{user.user_email})
+    </foreach>
+  </insert>
+
+
+  <select id="selectUserByIds" resultMap="BaseResultMap" >
+    SELECT id,cuserid,usercode,ifnull(er_user.user_name,'') as user_name,ifnull(er_user.user_phone,'') as user_phone,ifnull(er_user.user_email,'') as user_email from er_user WHERE cuserid IN
+    <foreach collection="list" item="user" index="index" separator="," open="(" close=")">
+      #{user.cuserid}
+
+    </foreach>
+
+  </select>
 </mapper>
