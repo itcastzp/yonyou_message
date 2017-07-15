@@ -44,13 +44,13 @@ public class ErMessageServiceImpl implements IErMessageService {
         return erMesgboardMapper.selectByUserPkdjh(userid,pk_djh);
     }
 
-    public int updateUnReadMessage(String userid,List<ErMesgboard> message) throws Exception {
+    public void updateUnReadMessage(String userid,List<ErMesgboard> message) throws Exception {
         for (ErMesgboard ems : message) {
             ems.setIsall(userid);
         }
-        String sql = "com.yonyou.message.mapper.ErMesgboardMapper.updateByPrimaryKey";
+        String sql = "com.yonyou.message.mapper.ErMesgboardMapper.updateUnReadMessage";
         mybatisDao.batchUpdate(sql,message);
-        return erMesgboardMapper.updateUnReadMessage(message);
+        //return erMesgboardMapper.updateUnReadMessage(message);
     }
 
     public List<ErMesgboard> selectByUserBillIds(String userid, JSONArray billids) throws Exception {

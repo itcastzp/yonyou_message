@@ -69,7 +69,7 @@ public class MessageController {
                     }
 
                 }
-                int a = erMessageService.updateUnReadMessage(user.getId(),list);
+                erMessageService.updateUnReadMessage(user.getId(),list);
             }
 
             data.put("code", "0");

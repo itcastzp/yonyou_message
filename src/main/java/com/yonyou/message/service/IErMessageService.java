@@ -16,6 +16,6 @@ public interface IErMessageService {
 
     ErMesgboard selectByPrimaryKey(String pk_messageid) throws Exception;
     List<ErMesgboard> selectByUserPkdjh(String userid,String pk_djh) throws Exception;
-    int updateUnReadMessage(String userid,List<ErMesgboard> message) throws Exception;
+    void updateUnReadMessage(String userid,List<ErMesgboard> message) throws Exception;
     List<ErMesgboard> selectByUserBillIds(String userid, JSONArray billids) throws Exception;
 }

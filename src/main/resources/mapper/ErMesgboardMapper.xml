@@ -22,7 +22,7 @@
     <result column="content" property="content" javaType="java.lang.String" jdbcType="VARCHAR" />
     <result column="sendTime" property="sendTime" javaType="java.lang.String" jdbcType="VARCHAR" />
     <result column="touser" property="touser" javaType="java.lang.String" jdbcType="VARCHAR" />
-
+    <result column="isread" property="isreal" javaType="java.lang.String" jdbcType="VARCHAR" />
 
   </resultMap>
 
@@ -58,7 +58,7 @@
 
 
   <sql id="Base_Column_List">
-    messageId, billPk, senderId, senderName, content, sendTime, touser, dr
+    messageId, billPk, senderId, senderName, content, sendTime, touser, dr,isread
   </sql>
 
   <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="messageMap">
@@ -180,15 +180,14 @@
 from er_mesgboard ,(select id from er_user where er_user.cuserid=#{0}) user  where
     find_in_set (CONCAT( '[',REPLACE(user.id,',','],[' ) , ']' ),er_mesgboard.isread) and er_mesgboard.isall=1 AND er_mesgboard.billPk=#{1}
   </select>
-  <update id="updateUnReadMessage" parameterType="java.util.List">
+  <update id="updateUnReadMessage" parameterType="com.yonyou.message.po.ErMesgboard">
 
-    <foreach collection="list" item="message" index="index" open="" close="" separator=";">
-      update er_mesgboard
+    update er_mesgboard
       <set>
-        isread  = #{message.isread}
+        isread  = #{isread}
       </set>
-      WHERE messageid = #{message.messageId};
-    </foreach>
+      WHERE messageid = #{messageId};
+
   </update>
 
   <select id="selectByUserBillIds" resultMap="messageHistoryMap">
