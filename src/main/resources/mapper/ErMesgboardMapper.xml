@@ -22,7 +22,7 @@
     <result column="content" property="content" javaType="java.lang.String" jdbcType="VARCHAR" />
     <result column="sendTime" property="sendTime" javaType="java.lang.String" jdbcType="VARCHAR" />
     <result column="touser" property="touser" javaType="java.lang.String" jdbcType="VARCHAR" />
-    <result column="isread" property="isreal" javaType="java.lang.String" jdbcType="VARCHAR" />
+    <result column="isread" property="isread" javaType="java.lang.String" jdbcType="VARCHAR" />
 
   </resultMap>
 
