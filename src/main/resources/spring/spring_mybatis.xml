@@ -12,7 +12,7 @@
        ">
 
     <!-- 加载config.properties -->
-    <context:property-placeholder location="classpath:db.properties" />
+    <context:property-placeholder location="classpath:db.properties,classpath:im.properties" />
     <!-- 配置自己的日志类 -->
     <!-- 		<property name="statLogger" ref="myLog" /> -->
 

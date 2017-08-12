@@ -40,6 +40,12 @@ public class TimeUtils {
         return min;
     }
 
+    public static String getTimeOut(String longTime) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return sdf.format(new Date(Long.parseLong(longTime)));
+
+    }
+
     public static void main(String[] args) {
         String a = "e:/jfwo/jfiowejf/jfiwoe/iwebap/jfiow/jifowej/joa.pdn";
         System.out.println(a.substring(a.indexOf("/iwebap"),a.length()));

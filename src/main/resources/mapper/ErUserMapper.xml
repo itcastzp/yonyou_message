@@ -3,8 +3,8 @@
 <mapper namespace="com.yonyou.message.mapper.ErUserMapper" >
   <resultMap id="BaseResultMap" type="com.yonyou.message.po.ErUser" >
 
-      <id column="id" property="id" jdbcType="VARCHAR" />
-      <result column="cuserid" property="cuserid" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <id column="u_id" property="u_id" jdbcType="VARCHAR" />
+      <result column="id" property="id" jdbcType="VARCHAR" javaType="java.lang.String" />
       <result column="busness_id" property="busnessId" jdbcType="VARCHAR" javaType="java.lang.String" />
       <result column="usercode" property="usercode" jdbcType="VARCHAR" javaType="java.lang.String" />
       <result column="user_name" property="user_name" jdbcType="VARCHAR" javaType="java.lang.String" />
@@ -70,14 +70,14 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    id,cuserid, busness_id, usercode, user_name, user_phone, user_email
+    u_id,id, busness_id, usercode, user_name, user_phone, user_email
   </sql>
 
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
     from er_user
-    where cuserid = #{userid,jdbcType=VARCHAR}
+    where id = #{userid,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
     delete from er_user
@@ -143,17 +143,17 @@
     where userid = #{userid,jdbcType=VARCHAR}
   </update>
   <insert id="insertUsers" parameterType="java.util.ArrayList" useGeneratedKeys="true" keyProperty="id">
-    INSERT into er_user (cuserid, usercode, user_name, user_phone, user_email) VALUES
+    INSERT into er_user (id, usercode, user_name, user_phone, user_email) VALUES
     <foreach collection="list" item="user" index="index" separator=",">
-      (#{user.cuserid},#{user.usercode},#{user.user_name},#{user.user_phone},#{user.user_email})
+      (#{user.id},#{user.usercode},#{user.user_name},#{user.user_phone},#{user.user_email})
     </foreach>
   </insert>
 
 
   <select id="selectUserByIds" resultMap="BaseResultMap" >
-    SELECT id,cuserid,usercode,ifnull(er_user.user_name,'') as user_name,ifnull(er_user.user_phone,'') as user_phone,ifnull(er_user.user_email,'') as user_email from er_user WHERE cuserid IN
+    SELECT u_id,id,usercode,ifnull(er_user.user_name,'') as user_name,ifnull(er_user.user_phone,'') as user_phone,ifnull(er_user.user_email,'') as user_email from er_user WHERE id IN
     <foreach collection="list" item="user" index="index" separator="," open="(" close=")">
-      #{user.cuserid}
+      #{user.id}
 
     </foreach>
 

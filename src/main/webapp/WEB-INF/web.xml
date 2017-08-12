@@ -48,7 +48,7 @@
     </init-param>
     <init-param>
       <param-name>cors.supportedHeaders</param-name>
-      <param-value>Accept, Origin, X-Requested-With, Content-Type, Last-Modified</param-value>
+      <param-value>Access-Control-Allow-Origin ,Accept, Origin, X-Requested-With, Content-Type, Last-Modified</param-value>
     </init-param>
     <init-param>
       <param-name>cors.exposedHeaders</param-name>
@@ -103,4 +103,7 @@
     <servlet-name>DruidStatView</servlet-name>
     <url-pattern>/druid/*</url-pattern>
   </servlet-mapping>
+  <session-config>
+    <session-timeout>0</session-timeout>
+  </session-config>
 </web-app>

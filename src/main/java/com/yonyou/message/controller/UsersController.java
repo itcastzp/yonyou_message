@@ -49,10 +49,10 @@ public class UsersController {
                         if (user_extis != null && user_extis.size() > 0) {
                             Map<String, String> user_have = new ConcurrentHashMap<String, String>();
                             for (ErUser user : user_extis) {
-                                user_have.put(user.getCuserid(),user.getUser_name());
+                                user_have.put(user.getId(),user.getUser_name());
                             }
                             for (ErUser user : list) {
-                                if (user_have.get(user.getCuserid()) == null) {
+                                if (user_have.get(user.getId()) == null) {
                                     insertIist.add(user);
                                 }
                             }

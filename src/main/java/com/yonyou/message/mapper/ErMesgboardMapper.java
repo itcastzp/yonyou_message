@@ -23,4 +23,5 @@ public interface ErMesgboardMapper {
 
     int updateUnReadMessage(List<ErMesgboard> message);
     List<ErMesgboard> selectByUserBillIds(@Param("userid")String userid, @Param("billids")JSONArray billids);
+
 }

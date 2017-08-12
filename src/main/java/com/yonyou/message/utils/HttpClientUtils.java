@@ -1,11 +1,14 @@
 package com.yonyou.message.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -127,6 +130,62 @@ public class HttpClientUtils {
             httpPost.setConfig(requestConfig);
             // 执行请求
             response = httpClient.execute(httpPost);
+            // 得到响应实例
+            HttpEntity entity = response.getEntity();
+
+            // 可以获得响应头
+            // Header[] headers = response.getHeaders(HttpHeaders.CONTENT_TYPE);
+            // for (Header header : headers) {
+            // System.out.println(header.getName());
+            // }
+
+            // 得到响应类型
+            // System.out.println(ContentType.getOrDefault(response.getEntity()).getMimeType());
+
+            // 判断响应状态
+            if (response.getStatusLine().getStatusCode() >= 300) {
+                throw new Exception(
+                        "HTTP Request is not success, Response code is " + response.getStatusLine().getStatusCode());
+            }
+
+            if (HttpStatus.SC_OK == response.getStatusLine().getStatusCode()) {
+                responseContent = EntityUtils.toString(entity, CHARSET_UTF_8);
+                EntityUtils.consume(entity);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                // 释放资源
+                if (response != null) {
+                    response.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return responseContent;
+    }
+
+    /**
+     * 发送PUT请求
+     *
+     * @param httpput
+     * @return
+     */
+    private static String sendHttpByPut(HttpPut httpput) {
+        CloseableHttpClient httpClient = null;
+        CloseableHttpResponse response = null;
+        // 响应内容
+        String responseContent = null;
+        try {
+            // 创建默认的httpClient实例.
+            httpClient = getHttpClient();
+            // 配置请求信息
+            httpput.setConfig(requestConfig);
+            // 执行请求
+            response = httpClient.execute(httpput);
             // 得到响应实例
             HttpEntity entity = response.getEntity();
 
@@ -384,9 +443,84 @@ public class HttpClientUtils {
         return parameterBuffer.toString();
     }
 
+    public static String sendHttpPut(String url, String jsonObject) {
+        HttpPut httpPut = new HttpPut(url);
+        try {
+            // 设置参数
+            if (jsonObject != null && jsonObject.trim().length() > 0) {
+                StringEntity stringEntity = new StringEntity(jsonObject, "UTF-8");
+                stringEntity.setContentType(CONTENT_TYPE_JSON_URL);
+                httpPut.setEntity(stringEntity);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return sendHttpByPut(httpPut);
+    }
     public static void main(String[] args) throws Exception {
 
 //        System.out.println(sendHttpGet("http://www.baidu.com"));
-        sendHttpPost("http://127.0.0.1:1228/servlet/djpdfservlet?djid=123456");
+        String url = "https://im.yyuap.com/sysadmin/rest/{etpId}/{appId}/token";
+        JSONObject json = new JSONObject();
+        json.put("clientId", "1d3c825ce9dceb2e56ecce8e26750cb9");
+        json.put("clientSecret", "FE8135E724E295F868B1C21056F8B3C6");
+        String gettoken = sendHttpPostJson("https://im.yyuap.com/sysadmin/rest/yonyoushare/app_id/token",json.toJSONString());
+        String token = JSON.parseObject(gettoken).getString("token");
+        System.out.println(token);
+        JSONObject user = new JSONObject();
+        user.put("username","1001WW1000000000054C");//id
+        user.put("nickname","李四");
+        user.put("password","");
+        user.put("email","");
+        user.put("orgId","");
+        user.put("photo","");
+        user.put("position","");
+        user.put("location","");
+        user.put("number","");
+        user.put("gender","");
+        user.put("remarks","");
+        user.put("mobile","");
+        user.put("telephone","");
+//        System.out.println(sendHttpPostJson("https://im.yyuap.com/sysadmin/rest/remote/user/yonyoushare/app_id/create?token="+token,user.toJSONString()));
+//        System.out.println(sendHttpPostJson("https://im.yyuap.com/sysadmin/rest/remote/user/yonyoushare/app_id/create?token="+token,user.toJSONString()));
+//        System.out.println(sendHttpGet("https://im.yyuap.com/sysadmin/rest/remotevcard/yonyoushare/app_id/?token="+token+"&username=1001WW1000000000dd0584"));
+//        System.out.println(sendHttpGet("https://im.yyuap.com/sysadmin/rest/remotevcard/yonyoushare/app_id/?token="+token+"&username=1001WW10000000000584"));
+//如果没有available 等信息，证明没有此用户
+        JSONObject group = new JSONObject();
+        String[] a = new String[2];
+        a[0] = "1001ww10000000000584";
+        a[1] = "1001ww1000000000054c";
+        group.put("operator", "1001ww10000000000584");//群主
+        group.put("operand",a);//成员
+        group.put("naturalLanguageName", "单据一");
+//        group.put("maxUsers", "");
+        group.put("etpId", "yonyoushare");
+        group.put("appId", "app_id");
+//        group.put("tag", "");
+//        System.out.println(sendHttpPostJson("https://im.yyuap.com/sysadmin/rest/remote/room/create/?token="+token,group.toJSONString()));
+        //返回 mubs7uou7ter0rfs1pfo9g6f.app_id.yonyoushare 这种格式的数据
+        //发送消息
+        JSONObject sendGroupMessage = new JSONObject();
+        sendGroupMessage.put("token", "");
+        sendGroupMessage.put("from", "1001ww10000000000584");
+        sendGroupMessage.put("to", "0wwtfs8psm8b2a8bdjd33w0x");
+        sendGroupMessage.put("content", "发送测试。");
+        sendGroupMessage.put("etpId", "yonyoushare");
+        sendGroupMessage.put("appId", "app_id");
+//        sendGroupMessage.put("extend", "");
+        sendGroupMessage.put("atuser", a);
+        sendGroupMessage.put("contentType", "2");
+        //System.out.println(sendHttpPostJson("https://im.yyuap.com/sysadmin/rest/yonyoushare/app_id/message/muc?token="+token,sendGroupMessage.toJSONString()));
+        JSONObject getGroupMembers = new JSONObject();
+        //获取群信息
+//        System.out.println(sendHttpGet("https://im.yyuap.com/sysadmin/rest/remote/room/detail?token="+token+"&name=0wwtfs8psm8b2a8bdjd33w0x.app_id.yonyoushare"));
+        System.out.println(sendHttpGet("https://im.yyuap.com/sysadmin/rest/remote/room/allmember?token="+token+"&name=0wwtfs8psm8b2a8bdjd33w0x.app_id.yonyoushare"));
+        //
+//        https://im.yyuap.com/sysadmin/rest/remote/room/member/add?token=67c4acbe-3d6f-4de2-a45b-bba351fd8bb6
+        JSONObject updataGroup = new JSONObject();
+        updataGroup.put("newOwner","1001ww1000000000054c");
+        updataGroup.put("oldOwner","1001ww10000000000584");
+        System.out.println(sendHttpPut("https://im.yyuap.com/sysadmin/rest/remote/room/yonyoushare/app_id/0wwtfs8psm8b2a8bdjd33w0x/owner?token="+token,getGroupMembers.toJSONString()));
+
     }
 }

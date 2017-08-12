@@ -171,14 +171,14 @@
   <select id="getHistoryMessages" resultMap="messageHistoryMap">
     SELECT
     <include refid="Base_Column_List" /> FROM er_mesgboard
-    where billPk = #{0,jdbcType=VARCHAR} and (isall =0 or senderid=#{1,jdbcType=VARCHAR}) and dr=0 OR (billPk = #{0,jdbcType=VARCHAR} and find_in_set((select id from er_user where cuserid =#{1,jdbcType=VARCHAR}),touser) and dr=0)
+    where billPk = #{0,jdbcType=VARCHAR} and (isall =0 or senderid=#{1,jdbcType=VARCHAR}) and dr=0 OR (billPk = #{0,jdbcType=VARCHAR} and find_in_set((select u_id from er_user where id =#{1,jdbcType=VARCHAR}),touser) and dr=0)
 
   </select>
 
   <select id="selectByUserPkdjh" resultMap="messageHistoryMap">
     select er_mesgboard.messageId,er_mesgboard.billPk,er_mesgboard.senderId,er_mesgboard.senderName,er_mesgboard.sendTime,er_mesgboard.content,er_mesgboard.isread,er_mesgboard.touser
-from er_mesgboard ,(select id from er_user where er_user.cuserid=#{0}) user  where
-    find_in_set (CONCAT( '[',REPLACE(user.id,',','],[' ) , ']' ),er_mesgboard.isread) and er_mesgboard.isall=1 AND er_mesgboard.billPk=#{1}
+from er_mesgboard ,(select u_id from er_user where er_user.id=#{0}) user  where
+    find_in_set (CONCAT( '[',REPLACE(user.u_id,',','],[' ) , ']' ),er_mesgboard.isread) and er_mesgboard.isall=1 AND er_mesgboard.billPk=#{1}
   </select>
   <update id="updateUnReadMessage" parameterType="com.yonyou.message.po.ErMesgboard">
 
@@ -192,8 +192,8 @@ from er_mesgboard ,(select id from er_user where er_user.cuserid=#{0}) user  whe
 
   <select id="selectByUserBillIds" resultMap="messageHistoryMap">
     select er_mesgboard.messageId,er_mesgboard.billPk,er_mesgboard.senderId,er_mesgboard.senderName,er_mesgboard.sendTime,er_mesgboard.content,er_mesgboard.isread,er_mesgboard.touser
-from er_mesgboard ,(select id from er_user where er_user.cuserid=#{userid}) user  where
-    find_in_set (CONCAT( '[',REPLACE(user.id,',','],[' ) , ']' ),er_mesgboard.isread) and er_mesgboard.isall=1 AND er_mesgboard.billPk in
+from er_mesgboard ,(select u_id from er_user where er_user.id=#{userid}) user  where
+    find_in_set (CONCAT( '[',REPLACE(user.u_id,',','],[' ) , ']' ),er_mesgboard.isread) and er_mesgboard.isall=1 AND er_mesgboard.billPk in
     <foreach collection="billids" item="item" open="(" close=")" separator=",">
       #{item.billid}
     </foreach>

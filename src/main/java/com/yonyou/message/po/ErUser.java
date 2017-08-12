@@ -1,7 +1,16 @@
 package com.yonyou.message.po;
 
 public class ErUser {
-    private String id;
+    public String getU_id() {
+        return u_id;
+    }
+
+    public void setU_id(String u_id) {
+        this.u_id = u_id;
+    }
+
+    private String u_id;
+
 
     public String getId() {
         return id;
@@ -11,7 +20,7 @@ public class ErUser {
         this.id = id;
     }
 
-    private String cuserid;
+    private String id;
     private String busnessId;
 
     private String usercode;
@@ -23,6 +32,24 @@ public class ErUser {
     private String user_email;
 
     private String activity;
+    private String user_id;
+    private String tenant_id;
+
+    public String getTenant_id() {
+        return tenant_id;
+    }
+
+    public void setTenant_id(String tenant_id) {
+        this.tenant_id = tenant_id;
+    }
+
+    public String getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
+    }
 
     public String getActivity() {
         return activity;
@@ -40,13 +67,7 @@ public class ErUser {
         this.busnessId = busnessId;
     }
 
-    public String getCuserid() {
-        return cuserid;
-    }
 
-    public void setCuserid(String cuserid) {
-        this.cuserid = cuserid;
-    }
 
     public String getUser_email() {
         return user_email;
