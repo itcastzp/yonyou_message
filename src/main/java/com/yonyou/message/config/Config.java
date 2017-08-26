@@ -24,6 +24,8 @@ public class Config {
     public String ybzUrl;
     @Value("${tenant_id}")
     public String tenant_id;
+    @Value("${descUrl}")
+    public String descUrl;
     public String token;
     public String expiration;
 

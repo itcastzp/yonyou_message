@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/message.iml" filepath="$PROJECT_DIR$/message.iml" />
+      <module fileurl="file://$PROJECT_DIR$/yonyou_message.iml" filepath="$PROJECT_DIR$/yonyou_message.iml" />
     </modules>
   </component>
 </project>

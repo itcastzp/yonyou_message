@@ -132,10 +132,8 @@ public class FileController {
                     MultipartFile f = multiRequest.getFile(iter.next());
                     if (f != null) {
                         // 取得当前上传文件的文件名称
-                        String myFileName = f.getOriginalFilename();
-                        if (myFileName.length() > 20) {
-                            throw new Exception("文件名超过20位!请重新输入!");
-                        }
+                        String oldname = f.getOriginalFilename();
+                        String myFileName = System.currentTimeMillis() +oldname.substring(oldname.lastIndexOf("."));
 
                         // 如果名称不为“”,说明该文件存在，否则说明该文件不存在
                         if (myFileName.trim() != "") {

@@ -166,7 +166,7 @@
     <input type="button" value="getMessageMembers" onclick="getMessageMembers()">
     <input type="button" value="getMessageFile" onclick="getfiles()">
     <input type="button" value="selectByUserPkdjh" onclick="selectByUserPkdjh()">
-    <form action="http://127.0.0.1:8080/message/fileUpload?messageid=1564647&uploader=3123212" method="post" enctype="multipart/form-data">
+    <form action="http://127.0.0.1:8080/message/message/imageUpload?messageid=1564647&uploader=3123212" method="post" enctype="multipart/form-data">
         <input type="file" name="file">
         <input type="submit" value="上传">
         <a href="/message/fileDownload?fileid=7" >patch_ssss.zip</a>

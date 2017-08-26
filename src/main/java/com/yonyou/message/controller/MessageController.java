@@ -11,9 +11,14 @@ import com.yonyou.message.service.IErMessageService;
 import com.yonyou.message.service.IErUserService;
 import com.yonyou.message.utils.HttpClientUtils;
 import com.yonyou.message.utils.TimeUtils;
+import com.yonyou.message.utils.TokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,11 +30,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
  * Created by Administrator on 2017/6/19.
@@ -368,7 +375,7 @@ public class MessageController {
                 session.setAttribute("expiration",newtoken.get("expiration"));
             }
 
-            MessageGroup group = erMessageService.getGroupByBillPk(billpk);
+            MessageGroup group = erMessageService.getGroupByBillPk(billpk,"");
             if (group != null && !group.getGrouppk().equals("")) {//获取群成员
                 jsonObject.put("groupPk", group.getGrouppk());
                 String reMessage = HttpClientUtils.sendHttpGet(config.baseUrl+"/remote/room/allmember?token="+token+"&name="+group.getGrouppk()+"."+config.appId+"."+config.eptId);
@@ -425,7 +432,9 @@ public class MessageController {
     @ResponseBody
     void BillMessage4YBZ(@RequestBody JSONObject json, HttpServletRequest request, HttpServletResponse response) throws Exception {
         String billpk = json.getString("billId");
+        String billtype = json.getString("billType");
         String tenant_id = json.getString("tenant_id");
+        String billurl = json.getString("billUrl");
         List<ErUser> userlist = null;
         ConcurrentLinkedQueue<String> userids = new ConcurrentLinkedQueue<String>();
         JSONObject rejson = new JSONObject();
@@ -438,11 +447,10 @@ public class MessageController {
         JSONObject para4ybz = new JSONObject();
         JSONObject json4ybz = null;
         para4ybz.put("billId", json.getString("billId"));
-        para4ybz.put("billNo", json.getString("billNo"));
         para4ybz.put("tenantId", tenant_id);
         para4ybz.put("usercode", json.getString("usercode"));
         String[] operand = null;
-        String re4ybz = HttpClientUtils.sendHttpPostJson(config.ybzUrl,para4ybz.toJSONString() );
+        String re4ybz = HttpClientUtils.sendHttpPostJson(billurl,para4ybz.toJSONString() );
 
         try {
             if (re4ybz.contains("操作成功")) {
@@ -458,11 +466,16 @@ public class MessageController {
                         }
                     }
                 }
-                ConcurrentHashMap<String, String> newtoken = getToken(config,json4ybz.getJSONObject("jsonDatas").getJSONObject("current_user").getString("tenant_id")+"_"+json4ybz.getJSONObject("jsonDatas").getJSONObject("current_user").getString("id"));
-                String token = newtoken.get("token");
+                String desc = HttpClientUtils.sendHttpPost(erMessageService.getDescUrlByTenantId(tenant_id)+"?billid="+billpk+"&billtype="+billtype);//请求nc获取单据描述
+                if(JSON.parseObject(desc).getString("code").equals("0")){
+                    json4ybz.getJSONObject("jsonDatas").getJSONObject("process_info").put("desc",JSON.parseObject(desc).getString("desc") );
+                }
+
+                String token = erMessageService.getServerToken();
+                String userToken = erMessageService.getUserToken(json4ybz.getJSONObject("jsonDatas").getJSONObject("current_user").getString("tenant_id") + "_" + json4ybz.getJSONObject("jsonDatas").getJSONObject("current_user").getString("id"));
                 imjson.put("userId",json4ybz.getJSONObject("jsonDatas").getJSONObject("current_user").getString("tenant_id")+"_"+json4ybz.getJSONObject("jsonDatas").getJSONObject("current_user").getString("id"));
-                imjson.put("userToken", newtoken.get("usertoken"));
-                MessageGroup group = erMessageService.getGroupByBillPk(billpk);
+                imjson.put("userToken", userToken);
+                MessageGroup group = erMessageService.getGroupByBillPk(billpk,tenant_id);
                 if (group != null && !group.getGrouppk().equals("")) {//获取群成员
                     String reMessage = HttpClientUtils.sendHttpGet(config.baseUrl + "/remote/room/allmember?token=" + token + "&name=" + group.getGrouppk() + "." + config.appId + "." + config.eptId);
                     if (reMessage.contains("@im.yyuap.com")) {//返回成功
@@ -500,6 +513,7 @@ public class MessageController {
                         ingroup.setBillpk(billpk);
                         ingroup.setGrouppk(reMessage.substring(0, reMessage.indexOf(".")));
                         ingroup.setCreatetime(TimeUtils.getCurrentTime());
+                        ingroup.setTenant_id(tenant_id);
                         ingroup = erMessageService.insertGroup(ingroup);
                         imjson.put("groupId", ingroup.getGrouppk());
                     }
@@ -524,6 +538,119 @@ public class MessageController {
         }
 
     }
+    @RequestMapping(value = "/addDescUrl", method = RequestMethod.GET)
+    public @ResponseBody void insertDescUrl(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        String tenant_id = request.getParameter("tenant_id");
+        String url = request.getParameter("url");
+        JSONObject rejson = new JSONObject();
+        try {
+            String descurl = erMessageService.getDescUrlByTenantId(tenant_id);
+            if(null != descurl && !descurl.equals("")){
+                erMessageService.insertDescUrl(tenant_id,url);
+                rejson.put("code", "0");
+                rejson.put("message", "插入成功");
+            }else {
+                rejson.put("code", "1");
+                rejson.put("message", "已经存在");
+            }
+
+        } catch (Exception e) {
+            rejson.put("code", "1");
+            rejson.put("message", e.getMessage()==null?e.getCause().getMessage():e.getMessage());
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }finally {
+            response.setContentType("text/html");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(rejson.toString());
+            response.flushBuffer();
+        }
+
+    }
+
+    @RequestMapping(value = "/getBillPks", method = RequestMethod.POST)
+    public @ResponseBody void getBillPk(@RequestBody JSONObject jsonObject, HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        String tenant_id = jsonObject.getString("tenant_id");
+        JSONObject rejson = new JSONObject();
+        try {
+            if (tenant_id.equals("")) {
+                rejson.put("code", "1");
+                rejson.put("message", "参数错误");
+            } else {
+                List<MessageGroup> group = erMessageService.getBillPk(tenant_id,jsonObject.getJSONArray("grouppks"));
+                JSONArray arr = JSON.parseArray(JSON.toJSONString(group));
+                rejson.put("group", arr);
+            }
+
+            rejson.put("code", "0");
+
+        } catch (Exception e) {
+            rejson.put("code", "1");
+            rejson.put("message", e.getMessage()==null?e.getCause().getMessage():e.getMessage());
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }finally {
+            response.setContentType("text/html");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(rejson.toString());
+            response.flushBuffer();
+        }
+
+    }
+    @RequestMapping(value = "/getUserUnReadMessageCount", method = RequestMethod.GET)
+    public @ResponseBody void getUserUnReadMessageCount(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String tenant_id = request.getParameter("tenant_id");
+        String userid = request.getParameter("userid");
+        String resource = request.getParameter("resource");
+        JSONObject rejson = new JSONObject();
+        String url = "https://im.yyuap.com/sysadmin/rest/history/";
+        ConcurrentSkipListSet set = new ConcurrentSkipListSet();
+        set.add("android");
+        set.add("ios");
+        set.add("web");
+        set.add("pc");
+        try {
+            if (tenant_id.equals("") || userid.equals("") || resource.equals("") || !set.contains(resource)) {
+                rejson.put("code", "1");
+                rejson.put("message", "参数错误!");
+            } else {
+                url += config.eptId + "/" + config.appId + "/" + tenant_id + "_" + userid + "/offline/count?token=" + erMessageService.getUserToken(tenant_id+"_"+userid) + "&resource=" + resource;
+                String count = HttpClientUtils.sendHttpGet(url);
+                rejson.put("code", "0");
+                rejson.put("size", count);
+            }
+        }catch (Exception e){
+
+        }finally{
+            response.setContentType("text/html");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(rejson.toString());
+            response.flushBuffer();
+        }
+    }
+    @RequestMapping(value = "/getUserToken", method = RequestMethod.POST)
+    public void getUserToken(@RequestBody JSONObject jsonObject, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String tenant_id = jsonObject.getString("tenant_id");
+        String userid = jsonObject.getString("userid");
+        JSONObject rejson = new JSONObject();
+        try {
+            rejson.put("appId",config.appId);
+            rejson.put("etpId",config.eptId);
+            rejson.put("userId",tenant_id+"_"+userid);
+            rejson.put("userToken",erMessageService.getUserToken(tenant_id+"_"+userid));
+        } catch (Exception e) {
+
+        }finally {
+            response.setContentType("text/html");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(rejson.toString());
+            response.flushBuffer();
+        }
+    }
+
+
     /**
      * 获取新token
      * @param config

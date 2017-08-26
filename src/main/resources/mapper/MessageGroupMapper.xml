@@ -5,13 +5,29 @@
         <id column="id" property="id" javaType="java.lang.String"></id>
         <result column="grouppk" property="grouppk" javaType="java.lang.String"/>
         <result column="billpk" property="billpk" javaType="java.lang.String" />
+        <result column="tenant_id" property="tenant_id" javaType="java.lang.String"/>
         <result column="createtime" property="createtime" javaType="java.lang.String"/>
     </resultMap>
     <select id="getGroupByBillPk" resultMap="result">
-        select grouppk,billpk,createtime from messagegroup where billpk=#{0};
+        select grouppk,billpk,tenant_id,createtime from messagegroup where billpk=#{0} and tenant_id=#{1};
     </select>
 
     <insert id="insertGroup" useGeneratedKeys="true" keyProperty="id" parameterType="com.yonyou.message.po.MessageGroup">
-        INSERT INTO messagegroup (billpk,grouppk,createtime) VALUES (#{billpk},#{grouppk},#{createtime});
+        INSERT INTO messagegroup (billpk,grouppk,tenant_id,createtime) VALUES (#{billpk},#{grouppk},#{tenant_id},#{createtime});
     </insert>
+
+    <select id="getDescUrlByTenantId" resultType="java.lang.String">
+        select url from er_ncurl where tenant_id=#{0}
+    </select>
+
+    <insert id="insertDescUrl" >
+        INSERT INTO er_ncurl(tenant_id,url) VALUES (#{0},#{1})
+    </insert>
+    <select id="getBillPk" resultMap="result">
+        select grouppk,billpk from messagegroup where tenant_id=#{tenant_id} and grouppk in
+        <foreach collection="grouppk" item="item" open="(" close=")" separator=",">
+            #{item.grouppk}
+        </foreach>
+        ;
+    </select>
 </mapper>
