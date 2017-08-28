@@ -31,4 +31,6 @@ public interface IErMessageService {
     String getServerToken() throws Exception;
 
     String getUserToken(String userid) throws Exception;
+
+    String getGroupPkByBillId(String billid) throws Exception;
 }

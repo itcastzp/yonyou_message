@@ -11,14 +11,9 @@ import com.yonyou.message.service.IErMessageService;
 import com.yonyou.message.service.IErUserService;
 import com.yonyou.message.utils.HttpClientUtils;
 import com.yonyou.message.utils.TimeUtils;
-import com.yonyou.message.utils.TokenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataAccessException;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,13 +25,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by Administrator on 2017/6/19.
@@ -604,8 +600,9 @@ public class MessageController {
         String tenant_id = request.getParameter("tenant_id");
         String userid = request.getParameter("userid");
         String resource = request.getParameter("resource");
+        String billid = request.getParameter("billId");
         JSONObject rejson = new JSONObject();
-        String url = "https://im.yyuap.com/sysadmin/rest/history/";
+        String url = "https://im.yyuap.com/sysadmin/rest/version/";
         ConcurrentSkipListSet set = new ConcurrentSkipListSet();
         set.add("android");
         set.add("ios");
@@ -616,13 +613,34 @@ public class MessageController {
                 rejson.put("code", "1");
                 rejson.put("message", "参数错误!");
             } else {
-                url += config.eptId + "/" + config.appId + "/" + tenant_id + "_" + userid + "/offline/count?token=" + erMessageService.getUserToken(tenant_id+"_"+userid) + "&resource=" + resource;
-                String count = HttpClientUtils.sendHttpGet(url);
+                url += config.eptId + "/" + config.appId + "/" + tenant_id + "_" + userid + "?token=" + erMessageService.getUserToken(tenant_id+"_"+userid) + "&resource=" + resource+"-v1.1";
+                String grouppk = erMessageService.getGroupPkByBillId(billid);
+                if (grouppk == null || grouppk.equals("")) {
+                    rejson.put("message", "未找到单据id");
+                } else {
+                    String count = HttpClientUtils.sendHttpGet(url);
+                    JSONObject message = JSON.parseObject(count);
+                    Map<String,Integer> mess_Size = new ConcurrentHashMap<String, Integer>();
+                    AtomicInteger size = new AtomicInteger(0);
+                    if(message.getJSONArray("packets") != null && message.getJSONArray("packets").size()>0){
+                        JSONArray packets = message.getJSONArray("packets");
+                        for (Iterator ite = packets.iterator() ; ite.hasNext();) {
+                            JSONObject packet = (JSONObject) ite.next();
+                            JSONObject from = JSON.parseObject(packet.getString("body"));
+                            String fromstr = from.getString("from");
+                            String grouppk_im = fromstr.substring(0, fromstr.indexOf("."));
+                            if (grouppk_im.equals(grouppk)) {
+                                size.addAndGet(1);
+                            }
+                        }
+                    }
+                    rejson.put("size", size);
+                }
                 rejson.put("code", "0");
-                rejson.put("size", count);
             }
         }catch (Exception e){
-
+            rejson.put("code", "1");
+            rejson.put("message", e.getMessage());
         }finally{
             response.setContentType("text/html");
             response.setCharacterEncoding("UTF-8");
@@ -630,10 +648,10 @@ public class MessageController {
             response.flushBuffer();
         }
     }
-    @RequestMapping(value = "/getUserToken", method = RequestMethod.POST)
+    @RequestMapping(value = "/getUserToken", method = RequestMethod.GET)
     public void getUserToken(@RequestBody JSONObject jsonObject, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String tenant_id = jsonObject.getString("tenant_id");
-        String userid = jsonObject.getString("userid");
+        String tenant_id = request.getParameter("tenant_id");
+        String userid = request.getParameter("userid");
         JSONObject rejson = new JSONObject();
         try {
             rejson.put("appId",config.appId);
@@ -649,8 +667,10 @@ public class MessageController {
             response.flushBuffer();
         }
     }
-
-
+//    @RequestMapping(value = "/getUserToken", method = RequestMethod.GET)
+//    public void getUserUnReadMessageDetail(){
+//
+//    }
     /**
      * 获取新token
      * @param config

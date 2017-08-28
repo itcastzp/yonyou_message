@@ -20,4 +20,6 @@ public interface MessageGroupMapper {
     void insertDescUrl( String tenant_id,String url);
 
     List<MessageGroup> getBillPk(@Param("tenant_id") String tenant_id, @Param("grouppk") JSONArray groupPk);
+
+    String getGroupPkByBillId(String billid);
 }

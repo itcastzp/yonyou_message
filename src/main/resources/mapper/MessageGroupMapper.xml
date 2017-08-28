@@ -30,4 +30,7 @@
         </foreach>
         ;
     </select>
+    <select id="getGroupPkByBillId" resultType="java.lang.String">
+        select grouppk from messagegroup where billpk =#{0};
+    </select>
 </mapper>

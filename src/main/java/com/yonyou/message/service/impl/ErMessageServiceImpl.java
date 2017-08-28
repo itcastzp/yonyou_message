@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -143,5 +142,9 @@ public class ErMessageServiceImpl implements IErMessageService {
                 }
             }
         }).toString();
+    }
+
+    public String getGroupPkByBillId(String billid) throws Exception {
+        return messageGroupMapper.getGroupPkByBillId(billid);
     }
 }
