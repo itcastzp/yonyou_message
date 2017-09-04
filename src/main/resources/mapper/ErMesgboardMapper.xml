@@ -137,7 +137,7 @@
     </trim>
   </insert>
 
-  <update id="updateByExampleSelective" parameterType="map">
+  <update id="updateByExampleSelective" parameterType="java.util.Map">
     update er_mesgboard
     <set>
       <if test="record.messageId != null">
