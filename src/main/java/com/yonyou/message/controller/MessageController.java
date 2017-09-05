@@ -462,9 +462,12 @@ public class MessageController {
                         }
                     }
                 }
-                String desc = HttpClientUtils.sendHttpPost(erMessageService.getDescUrlByTenantId(tenant_id)+"?billid="+billpk+"&billtype="+billtype+"&usercode="+json.getString("usercode"));//请求nc获取单据描述
-                if(JSON.parseObject(desc).getString("code").equals("0")){
-                    json4ybz.getJSONObject("jsonDatas").getJSONObject("process_info").put("desc",JSON.parseObject(JSON.parseObject(desc).getString("desc") ));
+                String descUrl = erMessageService.getDescUrlByTenantId(tenant_id);
+                if(descUrl != null && !descUrl.equals("")){
+                    String desc = HttpClientUtils.sendHttpPost(descUrl+"?billid="+billpk+"&billtype="+billtype+"&usercode="+json.getString("usercode"));//请求nc获取单据描述
+                    if(JSON.parseObject(desc).getString("code").equals("0")){
+                        json4ybz.getJSONObject("jsonDatas").getJSONObject("process_info").put("desc",JSON.parseObject(JSON.parseObject(desc).getString("desc") ));
+                    }
                 }
 
                 String token = erMessageService.getServerToken();
@@ -489,6 +492,7 @@ public class MessageController {
                             groupJson.put("name", group.getGrouppk());
                             groupJson.put("operand", operand);
                             HttpClientUtils.sendHttpPut(config.baseUrl + "remote/room/member/add?token=" + token, groupJson.toJSONString());
+                            //群組踢人
                         }
                     }
                     imjson.put("groupId", group.getGrouppk());
