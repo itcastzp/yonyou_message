@@ -546,7 +546,7 @@ public class MessageController {
         JSONObject rejson = new JSONObject();
         try {
             String descurl = erMessageService.getDescUrlByTenantId(tenant_id);
-            if(null != descurl && !descurl.equals("")){
+            if(null == descurl || descurl.equals("")){
                 erMessageService.insertDescUrl(tenant_id,url);
                 rejson.put("code", "0");
                 rejson.put("message", "插入成功");

@@ -77,11 +77,13 @@ public class ErMessageServiceImpl implements IErMessageService {
         return erMesgboardMapper.selectByUserBillIds(userid,billids);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.READ_COMMITTED)//若有加入，无新建事务，读取已提交数据
     public MessageGroup insertGroup(MessageGroup group) throws Exception {
         messageGroupMapper.insertGroup(group);
         return group;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.READ_COMMITTED)//若有加入，无新建事务，读取已提交数据
     public MessageGroup getGroupByBillPk(String billpk,String tenant_id) throws Exception {
         MessageGroup messageGroup = messageGroupMapper.getGroupByBillPk(billpk,tenant_id);
         return messageGroup;

@@ -217,12 +217,19 @@ public class FileController {
                     String path = request.getServletContext().getRealPath("/files/");
                     file = new File(path + File.separator + myfile.getFile_path() + File.separator + myfile.getFile_name());
                     headers = new HttpHeaders();
+                    MediaType type = MediaType.IMAGE_JPEG;
+                    String lastname = myfile.getFile_name().substring(myfile.getFile_name().lastIndexOf("."),myfile.getFile_name().length());
+                    if(lastname.toLowerCase().contains("gif")){
+                        type = MediaType.IMAGE_GIF;
+                    }else if(lastname.toLowerCase().contains("png")){
+                        type = MediaType.IMAGE_PNG;
+                    }
                     //下载显示的文件名，解决中文名称乱码问题
                     String downloadFielName = new String(myfile.getFile_name().getBytes("UTF-8"), "iso-8859-1");
                     //通知浏览器以attachment（下载方式）打开图片
                     //headers.setContentDispositionFormData("attachment", downloadFielName);
                     //application/octet-stream ： 二进制流数据（最常见的文件下载）。
-                    headers.setContentType(MediaType.IMAGE_GIF);
+                    headers.setContentType(type);
                 } else {
                     return null;
                 }
