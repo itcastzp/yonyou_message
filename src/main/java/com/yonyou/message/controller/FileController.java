@@ -23,8 +23,7 @@ import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -202,11 +201,14 @@ public class FileController {
     }
 
     @RequestMapping(value = "/ImageDownload", method = RequestMethod.GET)
-    public ResponseEntity<byte[]> imageDownload (HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void imageDownload (HttpServletRequest request, HttpServletResponse response) throws IOException {
         JSONObject json = new JSONObject();
         File file=null;
         HttpHeaders headers=null;
         String fileid = request.getParameter("fileid");
+
+        OutputStream outputStream = null;
+        InputStream inputStream = null;
         try {
             if (fileid == null || fileid.toString().equals("")) {
                 json.put("code", "1");
@@ -216,7 +218,15 @@ public class FileController {
                 if (myfile != null) {
                     String path = request.getServletContext().getRealPath("/files/");
                     file = new File(path + File.separator + myfile.getFile_path() + File.separator + myfile.getFile_name());
-                    headers = new HttpHeaders();
+
+                    outputStream = response.getOutputStream();
+                    inputStream = new FileInputStream(file);
+                    byte[] buffer = new byte[1024];
+                    int i = -1;
+                    while ((i = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, i);
+                    }
+//                    headers = new HttpHeaders();
                     MediaType type = MediaType.IMAGE_JPEG;
                     String lastname = myfile.getFile_name().substring(myfile.getFile_name().lastIndexOf("."),myfile.getFile_name().length());
                     if(lastname.toLowerCase().contains("gif")){
@@ -224,14 +234,15 @@ public class FileController {
                     }else if(lastname.toLowerCase().contains("png")){
                         type = MediaType.IMAGE_PNG;
                     }
-                    //下载显示的文件名，解决中文名称乱码问题
-                    String downloadFielName = new String(myfile.getFile_name().getBytes("UTF-8"), "iso-8859-1");
+                    response.setContentType(type.toString());
+//                    //下载显示的文件名，解决中文名称乱码问题
+//                    String downloadFielName = new String(myfile.getFile_name().getBytes("UTF-8"), "iso-8859-1");
                     //通知浏览器以attachment（下载方式）打开图片
                     //headers.setContentDispositionFormData("attachment", downloadFielName);
                     //application/octet-stream ： 二进制流数据（最常见的文件下载）。
-                    headers.setContentType(type);
+//                    headers.setContentType(type);
                 } else {
-                    return null;
+//                    return null;
                 }
 
 
@@ -240,9 +251,16 @@ public class FileController {
             LOGGER.error("error:fileid="+fileid+e.getMessage());
             e.printStackTrace();
         } finally {
+            if(outputStream!=null){
+                outputStream.flush();
+                outputStream.close();
+            }
+            if(inputStream !=null){
+                inputStream.close();
+            }
 
         }
-        return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(file), headers, HttpStatus.CREATED);
+//        return new ResponseEntity<byte[]>(FileUtils.readFileToByteArray(file), headers, HttpStatus.CREATED);
     }
     @RequestMapping(value = "/getMessageFile", method = RequestMethod.POST)
     public @ResponseBody void getMessageFile(HttpServletRequest request, HttpServletResponse response) throws IOException {
