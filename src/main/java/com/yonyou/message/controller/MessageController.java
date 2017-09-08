@@ -682,7 +682,7 @@ public class MessageController {
      * @param config
      * @return
      */
-    public static ConcurrentHashMap<String, String> getToken(Config config,String currentUser) {
+    public static ConcurrentHashMap<String, String> getToken(Config config,String currentUser)  throws Exception{
         ConcurrentHashMap<String,String> map = new ConcurrentHashMap<String, String>();
         String url = config.baseUrl+ config.eptId+"/"+config.appId+"/token";
         JSONObject json = new JSONObject();

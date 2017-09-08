@@ -118,7 +118,7 @@ public class HttpClientUtils {
      * @param httpPost
      * @return
      */
-    private static String sendHttpPost(HttpPost httpPost) {
+    private static String sendHttpPost(HttpPost httpPost) throws Exception{
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse response = null;
         // 响应内容
@@ -155,6 +155,7 @@ public class HttpClientUtils {
 
         } catch (Exception e) {
             e.printStackTrace();
+            throw e;
         } finally {
             try {
                 // 释放资源
@@ -163,6 +164,7 @@ public class HttpClientUtils {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+                throw e;
             }
         }
         return responseContent;
@@ -230,7 +232,7 @@ public class HttpClientUtils {
      * @param httpGet
      * @return
      */
-    private static String sendHttpGet(HttpGet httpGet) {
+    private static String sendHttpGet(HttpGet httpGet) throws Exception{
 
         CloseableHttpClient httpClient = null;
         CloseableHttpResponse response = null;
@@ -267,7 +269,7 @@ public class HttpClientUtils {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            throw e;
         } finally {
             try {
                 // 释放资源
@@ -276,6 +278,7 @@ public class HttpClientUtils {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+                throw e;
             }
         }
         return responseContent;
@@ -287,7 +290,7 @@ public class HttpClientUtils {
      * @param httpUrl
      *            地址
      */
-    public static String sendHttpPost(String httpUrl) {
+    public static String sendHttpPost(String httpUrl) throws Exception{
         // 创建httpPost
         HttpPost httpPost = new HttpPost(httpUrl);
         return sendHttpPost(httpPost);
@@ -298,7 +301,7 @@ public class HttpClientUtils {
      *
      * @param httpUrl
      */
-    public static String sendHttpGet(String httpUrl) {
+    public static String sendHttpGet(String httpUrl) throws Exception{
         // 创建get请求
         HttpGet httpGet = new HttpGet(httpUrl);
         return sendHttpGet(httpGet);
@@ -314,7 +317,7 @@ public class HttpClientUtils {
      * @param fileLists
      *            附件
      */
-    public static String sendHttpPost(String httpUrl, Map<String, String> maps, List<File> fileLists) {
+    public static String sendHttpPost(String httpUrl, Map<String, String> maps, List<File> fileLists) throws Exception{
         HttpPost httpPost = new HttpPost(httpUrl);// 创建httpPost
         MultipartEntityBuilder meBuilder = MultipartEntityBuilder.create();
         if (maps != null) {
@@ -342,7 +345,7 @@ public class HttpClientUtils {
      *            参数(格式:key1=value1&key2=value2)
      *
      */
-    public static String sendHttpPost(String httpUrl, String params) {
+    public static String sendHttpPost(String httpUrl, String params) throws Exception{
         HttpPost httpPost = new HttpPost(httpUrl);// 创建httpPost
         try {
             // 设置参数
@@ -363,7 +366,7 @@ public class HttpClientUtils {
      * @param maps
      *            参数
      */
-    public static String sendHttpPost(String httpUrl, Map<String, String> maps) {
+    public static String sendHttpPost(String httpUrl, Map<String, String> maps)  throws Exception{
         String parem = convertStringParamter(maps);
         return sendHttpPost(httpUrl, parem);
     }
@@ -377,7 +380,7 @@ public class HttpClientUtils {
      *            参数(格式 json)
      *
      */
-    public static String sendHttpPostJson(String httpUrl, String paramsJson) {
+    public static String sendHttpPostJson(String httpUrl, String paramsJson) throws Exception{
         HttpPost httpPost = new HttpPost(httpUrl);// 创建httpPost
         try {
             // 设置参数
@@ -387,7 +390,7 @@ public class HttpClientUtils {
                 httpPost.setEntity(stringEntity);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw e;
         }
         return sendHttpPost(httpPost);
     }
@@ -399,7 +402,7 @@ public class HttpClientUtils {
      * @param paramsXml  参数(格式 Xml)
      *
      */
-    public static String sendHttpPostXml(String httpUrl, String paramsXml) {
+    public static String sendHttpPostXml(String httpUrl, String paramsXml)  throws Exception{
         HttpPost httpPost = new HttpPost(httpUrl);// 创建httpPost
         try {
             // 设置参数

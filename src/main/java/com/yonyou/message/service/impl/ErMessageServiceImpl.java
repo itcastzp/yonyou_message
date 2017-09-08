@@ -113,7 +113,13 @@ public class ErMessageServiceImpl implements IErMessageService {
                     JSONObject json = new JSONObject();
                     json.put("clientId", config.clientId);
                     json.put("clientSecret", config.clientSecret);
-                    String getServertoken = HttpClientUtils.sendHttpPostJson(url,json.toJSONString());
+                    String getServertoken  = null;
+                    try {
+                        getServertoken = HttpClientUtils.sendHttpPostJson(url,json.toJSONString());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                     String token = JSON.parseObject(getServertoken).getString("token");
                     String expiration = JSON.parseObject(getServertoken).getString("expiration");
                     redisConnection.setNX(imServertoken, redisTemplate.getStringSerializer().serialize(token));
@@ -123,7 +129,7 @@ public class ErMessageServiceImpl implements IErMessageService {
             }
         }).toString();
     }
-    public String getUserToken(final String userid) {
+    public String getUserToken(final String userid) throws Exception {
         final String url = config.baseUrl+ config.eptId+"/"+config.appId+"/token";
         return redisTemplate.execute(new RedisCallback<Object>() {
             public Object doInRedis(RedisConnection redisConnection) throws DataAccessException {
@@ -135,7 +141,12 @@ public class ErMessageServiceImpl implements IErMessageService {
                     json.put("clientId", config.clientId);
                     json.put("clientSecret", config.clientSecret);
                     json.put("username", userid);
-                    String getServertoken = HttpClientUtils.sendHttpPostJson(url,json.toJSONString());
+                    String getServertoken = null;
+                    try {
+                        getServertoken = HttpClientUtils.sendHttpPostJson(url,json.toJSONString());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     String token = JSON.parseObject(getServertoken).getString("token");
                     String expiration = JSON.parseObject(getServertoken).getString("expiration");
                     redisConnection.setNX(imUsertoken, redisTemplate.getStringSerializer().serialize(token));
