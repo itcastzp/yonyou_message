@@ -522,6 +522,8 @@ public class MessageController {
                 rejson.put("imInfo",imjson);
                 rejson.put("code", "0");
             } else {
+                String mes = "时间:"+TimeUtils.getCurrentTime()+":url:"+billurl+"mess:"+re4ybz.toString();
+                log.error(mes);
                 rejson.put("code", "1");
                 rejson.put("message", "请求友报账数据失败");
             }
