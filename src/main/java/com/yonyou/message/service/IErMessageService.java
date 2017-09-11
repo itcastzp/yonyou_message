@@ -32,5 +32,5 @@ public interface IErMessageService {
 
     String getUserToken(String userid) throws Exception;
 
-    String getGroupPkByBillId(String billid) throws Exception;
+    String getGroupPkByBillId(String billid,String tenant_id) throws Exception;
 }

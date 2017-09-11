@@ -157,7 +157,7 @@ public class ErMessageServiceImpl implements IErMessageService {
         }).toString();
     }
 
-    public String getGroupPkByBillId(String billid) throws Exception {
-        return messageGroupMapper.getGroupPkByBillId(billid);
+    public String getGroupPkByBillId(String billid,String tenant_id) throws Exception {
+        return messageGroupMapper.getGroupPkByBillId(billid,tenant_id);
     }
 }

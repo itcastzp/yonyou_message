@@ -620,7 +620,7 @@ public class MessageController {
                 rejson.put("message", "参数错误!");
             } else {
                 url += config.eptId + "/" + config.appId + "/" + tenant_id + "_" + userid + "?token=" + erMessageService.getUserToken(tenant_id+"_"+userid) + "&resource=" + resource+"-v1.1";
-                String grouppk = erMessageService.getGroupPkByBillId(billid);
+                String grouppk = erMessageService.getGroupPkByBillId(billid,tenant_id);
                 if (grouppk == null || grouppk.equals("")) {
                     rejson.put("message", "未找到单据id");
                 } else {

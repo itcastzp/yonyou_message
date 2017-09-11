@@ -31,6 +31,6 @@
         ;
     </select>
     <select id="getGroupPkByBillId" resultType="java.lang.String">
-        select grouppk from messagegroup where billpk =#{0};
+        select grouppk from messagegroup where billpk =#{0} and tenant_id=#{1};
     </select>
 </mapper>

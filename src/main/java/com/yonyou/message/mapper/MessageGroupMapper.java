@@ -21,5 +21,5 @@ public interface MessageGroupMapper {
 
     List<MessageGroup> getBillPk(@Param("tenant_id") String tenant_id, @Param("grouppk") JSONArray groupPk);
 
-    String getGroupPkByBillId(String billid);
+    String getGroupPkByBillId(String billid,String tenant_id);
 }
