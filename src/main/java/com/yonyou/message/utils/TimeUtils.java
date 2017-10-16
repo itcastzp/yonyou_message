@@ -1,5 +1,8 @@
 package com.yonyou.message.utils;
 
+import sun.misc.BASE64Encoder;
+
+import java.security.MessageDigest;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -50,4 +53,16 @@ public class TimeUtils {
         String a = "e:/jfwo/jfiowejf/jfiwoe/iwebap/jfiow/jifowej/joa.pdn";
         System.out.println(a.substring(a.indexOf("/iwebap"),a.length()));
     }
+
+    public static String buildAuthKey(String userid, long timeSpan, String mKey) {
+        try {
+           String time = String.valueOf(timeSpan).substring(0, 7);
+           String key = userid + time + mKey;
+           byte[] codes = MessageDigest.getInstance("SHA-1").digest(key.getBytes("UTF-8"));
+          return new BASE64Encoder().encode(codes);
+         } catch (Exception e) {
+          e.printStackTrace();
+         }
+         return "";
+   }
 }

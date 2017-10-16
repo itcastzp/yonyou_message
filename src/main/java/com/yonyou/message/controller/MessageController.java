@@ -11,6 +11,8 @@ import com.yonyou.message.service.IErMessageService;
 import com.yonyou.message.service.IErUserService;
 import com.yonyou.message.utils.HttpClientUtils;
 import com.yonyou.message.utils.TimeUtils;
+import com.yonyou.ssccloud.sdk.BDPropertyUtil;
+import com.yonyou.ssccloud.sdk.HttpTookit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -447,6 +446,141 @@ public class MessageController {
         para4ybz.put("usercode", json.getString("usercode"));
         String[] operand = null;
         String re4ybz = HttpClientUtils.sendHttpPostJson(billurl,para4ybz.toJSONString() );
+
+        try {
+            if (re4ybz.contains("操作成功")) {
+                json4ybz = JSON.parseObject(re4ybz);
+                if (json4ybz.getJSONObject("jsonDatas") != null && json4ybz.getJSONObject("jsonDatas").getJSONObject("process_info").getJSONObject("users") != null && json4ybz.getJSONObject("jsonDatas").getJSONObject("process_info").getJSONObject("users").size() > 0) {
+                    JSONArray history = json4ybz.getJSONObject("jsonDatas").getJSONObject("process_info").getJSONObject("users").getJSONArray("history");
+                    JSONArray todo = json4ybz.getJSONObject("jsonDatas").getJSONObject("process_info").getJSONObject("users").getJSONArray("todo");
+                    userlist = JSON.parseArray(history.toJSONString(), ErUser.class);
+                    userlist.addAll(JSON.parseArray(todo.toJSONString(), ErUser.class));
+                    if (userlist != null && userlist.size() > 0) {
+                        for (ErUser user : userlist) {
+                            userids.add(user.getTenant_id()+"_"+user.getId());
+                        }
+                    }
+                }
+                String descUrl = erMessageService.getDescUrlByTenantId(tenant_id);
+                if(descUrl != null && !descUrl.equals("")){
+                    String desc = HttpClientUtils.sendHttpPost(descUrl+"?billid="+billpk+"&billtype="+billtype+"&usercode="+json.getString("usercode"));//请求nc获取单据描述
+                    if(JSON.parseObject(desc).getString("code").equals("0")){
+                        json4ybz.getJSONObject("jsonDatas").getJSONObject("process_info").put("desc",JSON.parseObject(JSON.parseObject(desc).getString("desc") ));
+                    }
+                }
+
+                String token = erMessageService.getServerToken();
+                String userToken = erMessageService.getUserToken(json4ybz.getJSONObject("jsonDatas").getJSONObject("current_user").getString("tenant_id") + "_" + json4ybz.getJSONObject("jsonDatas").getJSONObject("current_user").getString("id"));
+                imjson.put("userId",json4ybz.getJSONObject("jsonDatas").getJSONObject("current_user").getString("tenant_id")+"_"+json4ybz.getJSONObject("jsonDatas").getJSONObject("current_user").getString("id"));
+                imjson.put("userToken", userToken);
+                MessageGroup group = erMessageService.getGroupByBillPk(billpk,tenant_id);
+                if (group != null && !group.getGrouppk().equals("")) {//获取群成员
+                    String reMessage = HttpClientUtils.sendHttpGet(config.baseUrl + "/remote/room/allmember?token=" + token + "&name=" + group.getGrouppk() + "." + config.appId + "." + config.eptId);
+                    if (reMessage.contains("@im.yyuap.com")) {//返回成功
+                        String[] members = reMessage.split(",");
+                        if (userlist != null && userlist.size() > 0) {
+                            for (ErUser user : userlist) {
+                                for (int i = 0; i < members.length; i++) {
+                                    if (user.getId().equals("") || members[i].contains(user.getId())) {
+                                        userids.remove(user.getId());//移除已经存在的人员
+                                    }
+                                }
+                            }
+                            //将剩余人员插入群组
+                            operand = userids.toArray(new String[userids.size()]);
+                            groupJson.put("name", group.getGrouppk());
+                            groupJson.put("operand", operand);
+                            HttpClientUtils.sendHttpPut(config.baseUrl + "remote/room/member/add?token=" + token, groupJson.toJSONString());
+                            //群組踢人
+                        }
+                    }
+                    imjson.put("groupId", group.getGrouppk());
+                } else {//创建群，并加入成员
+                    if (userids.size() > 0) {//有流程人员信息
+                        operand = userids.toArray(new String[userids.size()]);
+                        groupJson.put("operator", json4ybz.getJSONObject("jsonDatas").getJSONObject("current_user").getString("tenant_id")+"_"+json4ybz.getJSONObject("jsonDatas").getJSONObject("current_user").getString("id"));
+                        groupJson.put("operand", operand);
+                    } else {//无,将当前登录人作为群主
+                        groupJson.put("operator", json4ybz.getJSONObject("jsonDatas").getJSONObject("current_user").getString("tenant_id")+"_"+json4ybz.getJSONObject("jsonDatas").getJSONObject("current_user").getString("id"));
+                        groupJson.put("operand", json4ybz.getJSONObject("jsonDatas").getJSONObject("current_user").getString("tenant_id")+"_"+json4ybz.getJSONObject("jsonDatas").getJSONObject("current_user").getString("id"));
+                    }
+
+                    groupJson.put("naturalLanguageName", billpk);
+                    String reMessage = HttpClientUtils.sendHttpPostJson(config.baseUrl + "remote/room/create?token=" + token, groupJson.toJSONString());
+                    if (reMessage.contains(config.appId + "." + config.eptId)) {//创建成功
+                        MessageGroup ingroup = new MessageGroup();
+                        ingroup.setBillpk(billpk);
+                        ingroup.setGrouppk(reMessage.substring(0, reMessage.indexOf(".")));
+                        ingroup.setCreatetime(TimeUtils.getCurrentTime());
+                        ingroup.setTenant_id(tenant_id);
+                        ingroup = erMessageService.insertGroup(ingroup);
+                        imjson.put("groupId", ingroup.getGrouppk());
+                    }
+                }
+                rejson.putAll(json4ybz);
+                rejson.put("imInfo",imjson);
+                rejson.put("code", "0");
+            } else {
+                String mes = "时间:"+TimeUtils.getCurrentTime()+":url:"+billurl+"mess:"+re4ybz.toString();
+                log.error(mes);
+                rejson.put("code", "1");
+                rejson.put("message", "请求友报账数据失败");
+            }
+        } catch (Exception e) {
+            rejson.put("code", "1");
+            rejson.put("message", e.getMessage()==null?e.getCause().getMessage():e.getMessage());
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }finally {
+            response.setContentType("text/html");
+            response.setCharacterEncoding("UTF-8");
+            response.getWriter().write(rejson.toString());
+            response.flushBuffer();
+        }
+
+    }
+
+    @RequestMapping(value = "/BillMessage4Nc", method = RequestMethod.POST)
+    public
+    @ResponseBody
+    void BillMessage4Nc(@RequestBody JSONObject json, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        String billpk = json.getString("billId");
+        String billtype = json.getString("billType");
+        String tenant_id = json.getString("tenant_id");
+        String billurl = json.getString("billUrl");
+        List<ErUser> userlist = null;
+        ConcurrentLinkedQueue<String> userids = new ConcurrentLinkedQueue<String>();
+        JSONObject rejson = new JSONObject();
+        JSONObject groupJson = new JSONObject();
+        JSONObject imjson = new JSONObject();
+        imjson.put("etpId", config.eptId);
+        imjson.put("appId", config.appId);
+        groupJson.put("etpId", config.eptId);
+        groupJson.put("appId", config.appId);
+        Map<String,String> para4nc = new ConcurrentHashMap<String, String>();
+        JSONObject json4ybz = null;
+        para4nc.put("billId", json.getString("billId"));
+        para4nc.put("tenantId", tenant_id);
+        para4nc.put("usercode", json.getString("usercode"));
+        para4nc.put("tradetype",billtype);
+        String[] operand = null;
+//        String secureKey = TimeUtils.buildAuthKey(json.getString("usercode"),System.currentTimeMillis(),"123").replace("+","%2B");
+        String secureKey = BDPropertyUtil.md5("yonyoussc" + "_" + tenant_id + "_" + json.getString("usercode") + "_" + BDPropertyUtil.getCurDate());
+        String logurl = "http://172.20.4.183:1228/portal/core?userId="+json.getString("usercode") + "&_time=" + new Date().getTime();
+        Map login = new ConcurrentHashMap();
+        login.put("thd_secureKey",secureKey);
+        login.put("thd_tenantId",tenant_id);
+        login.put("thd_userId",json.getString("usercode"));
+        login.put("thd_srcappId", "yonyoussc");
+        try {
+            String logstr = HttpTookit.doGet(logurl,null,login);
+            System.out.println(logstr);
+        }catch (Throwable e){
+
+        }
+
+//        HttpTookit.doGet(logurl,new ConcurrentHashMap<String, String>(),login);
+        String re4ybz = HttpTookit.doPost(billurl+"?billId="+billpk+"&tradetype="+billtype+"&usercode="+json.getString("usercode"),para4nc );
 
         try {
             if (re4ybz.contains("操作成功")) {
