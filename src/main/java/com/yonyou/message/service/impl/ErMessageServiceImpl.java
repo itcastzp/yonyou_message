@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.apache.ibatis.session.SqlSession;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +39,8 @@ public class ErMessageServiceImpl implements IErMessageService {
     private MybatisDao mybatisDao;
     @Autowired
     private Config config;
+    @Autowired
+	private SqlSession sqlSession;
     @Resource(name = "redisTemplate")
     private RedisTemplate<String, String> redisTemplate;
     @Transactional(propagation = Propagation.REQUIRED,isolation = Isolation.READ_COMMITTED)//若有加入，无新建事务，读取已提交数据
@@ -160,4 +162,10 @@ public class ErMessageServiceImpl implements IErMessageService {
     public String getGroupPkByBillId(String billid,String tenant_id) throws Exception {
         return messageGroupMapper.getGroupPkByBillId(billid,tenant_id);
     }
+    
+    public List<Employee> getEmps(){
+		//
+		//EmployeeMapper mapper = sqlSession.getMapper(EmployeeMapper.class);
+		return employeeMapper.getEmps();
+	}
 }
